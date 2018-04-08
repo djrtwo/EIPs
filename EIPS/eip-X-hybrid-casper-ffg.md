@@ -152,6 +152,14 @@ Many of the above specification details were made to minimize consensus changes 
 
 *insert: Discuss economic constants*
 
+`WITHDRAWAL_DELAY` is set to 15000 epochs to freeze a validator's funds for approximately 4 months after logout. This allows for a 4 month window to find and slash a validator for attempting to finalize two conflicting checkpoints.
+```python
+delay_in_months = (15000 epochs) * (50 blocks/epoch) * (14 seconds/block) * (1/86400 days/second) * (1/30.4 month/day)
+round(delay_in_months, 2) == 4.00
+```
+
+`DYNASTY_LOGOUT_DELAY` is set set to 700 dynasties to prevent immediately logging out in the event of an attack from being a viable strategy.
+
 A fixed amount of 5 million ether was chosen as `CASPER_BALANCE` to fund the casper contract. This only gives the contract enough runway to operate for approximately _insert time based on economic constants_, acting similarly to the "difficulty bomb". This "funding crunch" forces the network to hard-fork in the relative near future to further fund the contract. This future hard fork is a good opportunity to upgrade the contract and likely transition to full PoS.
 
 The PoW block reward is further reduced to 0.6 eth/block because security of the chain is greatly shifted from PoW to PoS finality and because rewards are now issued to both stakers and miners.
