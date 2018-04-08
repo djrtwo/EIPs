@@ -33,7 +33,7 @@ The FFG contract can be layered on top of any block proposal mechanism, providin
 * `HYBRID_CASPER_FORK_BLKNUM`: TBD
 * `CASPER_ADDR`: TBD
 * `CASPER_CODE`: see below
-* `CASPER_BALANCE`: 5e24 (5_000_000 eth)
+* `CASPER_BALANCE`: 5e24 (5_000_000 ETH)
 * `SIGHASHER_ADDR`: TBD
 * `SIGHASHER_CODE`: see below
 * `PURITY_CHECKER_ADDR`: TBD
