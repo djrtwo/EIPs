@@ -162,7 +162,9 @@ The EVM bytecode that the contract should be set to is:
 ## Rationale
 
 #### Minimize Consensus Changes
-Many of the above specification details were made to minimize consensus changes across clients. Firstly, the finality gadget itself is implemented as a contract in the EVM rather than as client specific logic in the protocol layer. The contract bytecode is deployed once and encapsulates most of the complexity of the fork. Similarly, `CASPER_ADDR` is granted a balance of ether from which to issue validator rewards. This could have been implemented in the protocol layer, granting special privilages to `CASPER_ADDR` to mint ether, but these options were all seen as far more invasive and error prone than relying upon the existing mechanics of the EVM. If a client has correct logic for a contract sending ether, then that client can handle casper issuance.
+The finality gadget is designed to minimize minimize changes across clients. For this reason, FFG is implemented within the EVM, so that the contract byte code encapsulates most of the complexity of the fork.
+
+For example, it would be possible to allow `CASPER_ADDR` to mint Ether each time it payed rewards (as compared to creating the contract with `CASPER_BALANCE`), but this would be more invasive and error-prone than relying on existing EVM mechanics. 
 
 #### Economic Constants
 *insert: Discuss economic constants*
