@@ -93,10 +93,18 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, the fork choice rule is the foll
 
 A client considers a checkpoint finalized if the following hold true:
 
-* During an epoch, the previous epoch is finalized within the casper contract -- `casper.last_finalized_epoch() == casper.current_epoch() - 1`
-* The current dynasty deposits _during the proposed finalized epoch_ were greater than `NON_REVERT_MIN_DEPOSIT` -- `casper_during_finalized_epoch.total_curdyn_deposits_scaled() > NON_REVERT_MIN_DEPOSIT`
-* The previous dynasty deposits _during the proposed finalized epoch_ were greater than `NON_REVERT_MIN_DEPOSIT` -- `casper_during_finalized_epoch.total_prevdyn_deposits_scaled() > NON_REVERT_MIN_DEPOSIT`
-
+* During an epoch, the previous epoch is finalized within the casper contract:
+```python
+casper.last_finalized_epoch() == casper.current_epoch() - 1
+```
+* The current dynasty deposits _during the proposed finalized epoch_ were greater than `NON_REVERT_MIN_DEPOSIT`:
+```python
+casper_during_finalized_epoch.total_curdyn_deposits_scaled() > NON_REVERT_MIN_DEPOSIT
+```
+* The previous dynasty deposits _during the proposed finalized epoch_ were greater than `NON_REVERT_MIN_DEPOSIT`:
+```python
+casper_during_finalized_epoch.total_prevdyn_deposits_scaled() > NON_REVERT_MIN_DEPOSIT
+```
 
 #### Block Reward
 
