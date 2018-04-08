@@ -187,7 +187,7 @@ Successful casper `vote` transactions are included at the end of the block so th
 The call to `initialize_epoch` at the beginning of each epoch requires 0 gas so that this protocol state transition does not take any gas allowance away from normal transactions.
 
 #### NULL_SENDER and Account Abstraction
-This EIP implements a limited version of account abstraction for validator's `vote` transactions. The general design was borrowed from [EIP 86](https://github.com/ethereum/EIPs/blob/fd171bb7792157257cb707082fd1c6891b1f6ca5/EIPS/eip-86.md).
+This EIP implements a limited version of account abstraction for validator's `vote` transactions. The general design was borrowed from [EIP 86](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-86.md).
 
 ## Backwards Compatibility
 This EIP is not forward compatible and introduces backwards incompatibilities in the state, fork choice rule, block reward, and gas calculations on certain transactions. Therefore, it should be included in a scheduled hardfork at a certain block number.
