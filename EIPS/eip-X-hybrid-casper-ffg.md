@@ -72,7 +72,7 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM and block.number % EPOCH_LENGTH ==
 * `GAS`: 3141592
 * `TO`: CASPER_ADDR
 * `VALUE`: 0
-* `DATA`: <encoded call casper_translator.encode('initialize_epoch', [floor(block.number / EPOCH_LENGTH)])>
+* `DATA`: <encoded call `casper_translator.encode('initialize_epoch', [floor(block.number / EPOCH_LENGTH)])`>
 
 This transaction utilizes no gas and does not increment `NULL_SENDER`s nonce
 
