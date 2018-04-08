@@ -8,9 +8,13 @@ author: Danny Ryan <danny@ethereum.org>, Chih-Cheng Liang <cc@ethereum.org>
 created: 2018-04-05
 ---
 
+## Simple Summary
+
+There is a general consensus to transition Ethereum from Proof of Work (PoW) to Proof of Stake (PoS). This EIP provides a specification of the first step in this process -- a hybrid model that uses both PoW and PoS to build and secure the network.
+
 ## Abstract
 
-This EIP describes the specification for implementing and hard-forking the Ethereum network to support hybrid Proof of Work (PoW)/Proof of Stake (PoS) via Casper the Friendly Finality Gadget (FFG). In this hybrid model, existing PoW mechanics are used as the block proposal mechanism while PoS is layered on top providing economic finality through a modified fork choice rule. Because network security is partially shifted from PoW to PoS, PoW block reward is reduced.
+This EIP describes the specification for implementing and hard-forking the Ethereum network to support hybrid PoW/PoS via Casper the Friendly Finality Gadget (FFG). In this hybrid model, existing PoW mechanics are used as the block proposal mechanism while PoS is layered on top via an EVM contract, providing economic finality through a modified fork choice rule. Because network security is partially shifted from PoW to PoS, PoW block reward is reduced.
 
 This EIP does not provide safety or liveness proofs. See the [Casper FFG](https://arxiv.org/abs/1710.09437) paper for a more detailed formal discussion.
 
@@ -165,3 +169,9 @@ A fixed amount of 5 million ether was chosen as `CASPER_BALANCE` to fund the cas
 The PoW block reward is further reduced to 0.6 eth/block because security of the chain is greatly shifted from PoW to PoS finality and because rewards are now issued to both stakers and miners.
 
 Successful casper `vote` transactions are included at the end of the block so that they can be processed in parallel with normal block transactions and cost 0 gas for validators.
+
+## Backwards Compatibility
+This EIP is not forward compatible and introduces backwards incompatibilities in the state, fork choice rule, block reward, and gas calculations on certain transactions. Therefore, it should be included in a scheduled hardfork at a certain block number.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
