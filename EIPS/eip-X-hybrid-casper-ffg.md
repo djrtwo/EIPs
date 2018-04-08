@@ -10,7 +10,7 @@ created: 2018-04-05
 
 ## Abstract
 
-This EIP describes the specification for implementating and hard-forking the Ethereum network to support hybrid Proof of Work (PoW)/Proof of Stake (PoS) via Casper the Friendly Finality Gadget (FFG). In this hybrid model, existing PoW mechanics are used as the block proposal mechanism while PoS is layered on top providing economic finality through a modified forkchoice rule. Because network security is partially shifted from PoW to PoS, PoW block reward is reduced.
+This EIP describes the specification for implementing and hard-forking the Ethereum network to support hybrid Proof of Work (PoW)/Proof of Stake (PoS) via Casper the Friendly Finality Gadget (FFG). In this hybrid model, existing PoW mechanics are used as the block proposal mechanism while PoS is layered on top providing economic finality through a modified fork choice rule. Because network security is partially shifted from PoW to PoS, PoW block reward is reduced.
 
 This EIP does not provide safety or liveness proofs. See the [Casper FFG](https://arxiv.org/abs/1710.09437) paper for a more detailed formal discussion.
 
@@ -89,7 +89,7 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, the fork choice rule is the foll
 
 A client considers a checkpoint finalized if the following hold true:
 
-* During an epoch, the previous epoch is finalized within the casper contract -- `casper.last_finalized_epoch() == casper.get_current_epoch() - 1`
+* During an epoch, the previous epoch is finalized within the casper contract -- `casper.last_finalized_epoch() == casper.current_epoch() - 1`
 * The current dynasty deposits _during the proposed finalized epoch_ were greater than `NON_REVERT_MIN_DEPOSIT` -- `casper_during_finalized_epoch.total_curdyn_deposits_scaled() > NON_REVERT_MIN_DEPOSIT`
 * The previous dynasty deposits _during the proposed finalized epoch_ were greater than `NON_REVERT_MIN_DEPOSIT` -- `casper_during_finalized_epoch.total_prevdyn_deposits_scaled() > NON_REVERT_MIN_DEPOSIT`
 
