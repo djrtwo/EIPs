@@ -14,11 +14,11 @@ Specification of the first step to transition Ethereum main net from Proof of Wo
 
 ## Abstract
 
-This EIP describes the specification for implementing and hard-forking the Ethereum network to support hybrid PoW/PoS via Casper the Friendly Finality Gadget (FFG). In this hybrid model, existing PoW mechanics are used as the block proposal mechanism while PoS is layered on top via an EVM contract, providing economic finality through a modified fork choice rule. Because network security is partially shifted from PoW to PoS, PoW block reward is reduced.
+This EIP specifies a hybrid PoW/PoS consensus model for Ethereum main net. Existing PoW mechanics are used for new block creation, and a novel PoS mechanism called Casper the Friendly Finality Gadget (FFG) is is layered on top using a smart contract.
 
-This EIP does not provide safety or liveness proofs. See the [Casper FFG](https://arxiv.org/abs/1710.09437) paper for a more detailed formal discussion.
+Through the use of Ether deposits, slashing conditions, and a modified fork choice, FFG allows the underlying PoW blockchain to be finalized.  As network security is partially shifted from PoW to PoS, PoW block rewards can be reduced. 
 
-This EIP does not provide validator implementation details. See the [Casper Implementation Guide](https://github.com/ethereum/casper/blob/master/IMPLEMENTATION.md) for validator details.
+This EIP does not contain the safety and liveness proofs or the validator implementation details, but these can be found in the [Casper FFG paper](https://arxiv.org/abs/1710.09437) and [Casper Implementation Guide](https://github.com/ethereum/casper/blob/master/IMPLEMENTATION.md) respectively.
 
 ## Motivation
 
