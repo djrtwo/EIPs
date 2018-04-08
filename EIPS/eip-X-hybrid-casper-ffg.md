@@ -74,14 +74,16 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM and block.number % EPOCH_LENGTH ==
 * `VALUE`: 0
 * `DATA`: <encoded call casper_translator.encode('initialize_epoch', [floor(block.number / EPOCH_LENGTH)])>
 
-This transaction utilizes no gas.
+This transaction utilizes no gas and does not increment `NULL_SENDER`s nonce
 
 #### Casper Votes
 
 If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, then:
 
-* all successful `vote` transactions to `CASPER_ADDR` with sender as `NULL_SENDER` must be included at the end of the block
-* all successful `vote` transactions to `CASPER_ADDR` with sender as `NULL_SENDER` utilize no gas
+* all successful `vote` transactions to `CASPER_ADDR` with sender as `NULL_SENDER`:
+  * must be included at the end of the block
+  * utilize no gas
+  * do not incrememt `NULL_SENDER`s nonce
 * all unsuccessful `vote` transactions to `CASPER_ADDR` are considered invalid and are not to be included in the block
 
 #### Fork Choice
@@ -160,8 +162,10 @@ The EVM bytecode that the contract should be set to is:
 
 ## Rationale
 
+#### Minimize Consensus Changes
 Many of the above specification details were made to minimize consensus changes across clients. Firstly, the finality gadget itself is implemented as a contract in the EVM rather than as client specific logic in the protocol layer. The contract bytecode is deployed once and encapsulates most of the complexity of the fork. Similarly, `CASPER_ADDR` is granted a balance of ether from which to issue validator rewards. This could have been implemented in the protocol layer, granting special privilages to `CASPER_ADDR` to mint ether, but these options were all seen as far more invasive and error prone than relying upon the existing mechanics of the EVM. If a client has correct logic for a contract sending ether, then that client can handle casper issuance.
 
+#### Economic Constants
 *insert: Discuss economic constants*
 
 `WITHDRAWAL_DELAY` is set to 15000 epochs to freeze a validator's funds for approximately 4 months after logout. This allows for a 4 month window to find and slash a validator for attempting to finalize two conflicting checkpoints.
@@ -172,11 +176,18 @@ round(delay_in_months, 2) == 4.00
 
 `DYNASTY_LOGOUT_DELAY` is set set to 700 dynasties to prevent immediately logging out in the event of an attack from being a viable strategy.
 
+#### Issuance
 A fixed amount of 5 million ether was chosen as `CASPER_BALANCE` to fund the casper contract. This only gives the contract enough runway to operate for approximately _insert time based on economic constants_, acting similarly to the "difficulty bomb". This "funding crunch" forces the network to hard-fork in the relative near future to further fund the contract. This future hard fork is a good opportunity to upgrade the contract and likely transition to full PoS.
 
 The PoW block reward is further reduced to 0.6 eth/block because security of the chain is greatly shifted from PoW to PoS finality and because rewards are now issued to both stakers and miners.
 
+#### Gas Changes
 Successful casper `vote` transactions are included at the end of the block so that they can be processed in parallel with normal block transactions and cost 0 gas for validators.
+
+The call to `initialize_epoch` at the beginning of each epoch requires 0 gas so that this protocol state transition does not take any gas allowance away from normal transactions.
+
+#### NULL_SENDER and Account Abstraction
+This EIP implements a limited version of account abstraction for validator's `vote` transactions. The general design was borrowed from [EIP 86](https://github.com/ethereum/EIPs/blob/fd171bb7792157257cb707082fd1c6891b1f6ca5/EIPS/eip-86.md).
 
 ## Backwards Compatibility
 This EIP is not forward compatible and introduces backwards incompatibilities in the state, fork choice rule, block reward, and gas calculations on certain transactions. Therefore, it should be included in a scheduled hardfork at a certain block number.
