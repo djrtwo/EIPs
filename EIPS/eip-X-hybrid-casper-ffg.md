@@ -10,7 +10,7 @@ created: 2018-04-05
 
 ## Simple Summary
 
-There is a general consensus to transition Ethereum from Proof of Work (PoW) to Proof of Stake (PoS). This EIP provides a specification of the first step in this process -- a hybrid model that uses both PoW and PoS to build and secure the network.
+Specification of the first step to transition Ethereum main net from Proof of Work (PoW) to Proof of Stake (PoS). The resulting consensus model is a PoW/PoS hybrid.
 
 ## Abstract
 
