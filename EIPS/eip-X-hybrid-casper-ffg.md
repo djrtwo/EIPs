@@ -145,3 +145,15 @@ The EVM bytecode that the contract should be set to is:
 ```
 0x
 ```
+
+## Rationale
+
+Many of the above specification details were made to minimize consensus changes across clients. Firstly, the finality gadget itself is implemented as a contract in the EVM rather than as client specific logic in the protocol layer. The contract bytecode is deployed once and encapsulates most of the complexity of the fork. Similarly, `CASPER_ADDR` is granted a balance of ether from which to issue validator rewards. This could have been implemented in the protocol layer, granting special privilages to `CASPER_ADDR` to mint ether, but these options were all seen as far more invasive and error prone than relying upon the existing mechanics of the EVM. If a client has correct logic for a contract sending ether, then that client can handle casper issuance.
+
+*insert: Discuss economic constants*
+
+A fixed amount of 5 million ether was chosen as `CASPER_BALANCE` to fund the casper contract. This only gives the contract enough runway to operate for approximately _insert time based on economic constants_, acting similarly to the "difficulty bomb". This "funding crunch" forces the network to hard-fork in the relative near future to further fund the contract. This future hard fork is a good opportunity to upgrade the contract and likely transition to full PoS.
+
+The PoW block reward is further reduced to 0.6 eth/block because security of the chain is greatly shifted from PoW to PoS finality and because rewards are now issued to both stakers and miners.
+
+Successful casper `vote` transactions are included at the end of the block so that they can be processed in parallel with normal block transactions and cost 0 gas for validators.
