@@ -55,7 +55,7 @@ The FFG contract can be layered on top of any block proposal mechanism, providin
 
 ## Specification
 
-### Deploying Casper Contract
+#### Deploying Casper Contract
 
 If `block.number == HYBRID_CASPER_FORK_BLKNUM`, then when processing the block, before processing any transactions:
 
@@ -64,7 +64,7 @@ If `block.number == HYBRID_CASPER_FORK_BLKNUM`, then when processing the block, 
 * set the code of `CASPER_ADDR` to `CASPER_CODE`
 * set balance of `CASPER_ADDR` to `CASPER_BALANCE` for issuance
 
-### Initialize Epochs
+#### Initialize Epochs
 
 If `block.number >= HYBRID_CASPER_FORK_BLKNUM and block.number % EPOCH_LENGTH == 0`, then execute a call with the following parameters at the start of the block:
 
@@ -76,7 +76,7 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM and block.number % EPOCH_LENGTH ==
 
 This transaction utilizes no gas.
 
-### Casper Votes
+#### Casper Votes
 
 If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, then:
 
@@ -84,7 +84,7 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, then:
 * all successful `vote` transactions to `CASPER_ADDR` with sender as `NULL_SENDER` utilize no gas
 * all unsuccessful `vote` transactions to `CASPER_ADDR` are considered invalid and are not to be included in the block
 
-### Fork Choice
+#### Fork Choice
 
 If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, the fork choice rule is the following:
 1. Start with last finalized checkpoint
@@ -98,16 +98,16 @@ A client considers a checkpoint finalized if the following hold true:
 * The previous dynasty deposits _during the proposed finalized epoch_ were greater than `NON_REVERT_MIN_DEPOSIT` -- `casper_during_finalized_epoch.total_prevdyn_deposits_scaled() > NON_REVERT_MIN_DEPOSIT`
 
 
-### Block Reward
+#### Block Reward
 
 If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, then `block_reward = NEW_BLOCK_REWARD` and utilize the same formulas for uncle and nephew rewards but with the updated `block_reward`.
 
-### Validators
+#### Validators
 
 The mechanics and responsibilities of validators are not specified in this EIP because they rely upon network transactions to the contract at `CASPER_ADDR` rather than on protocol level implementation and changes.
 See the [Casper Implementation Guide](https://github.com/ethereum/casper/blob/master/IMPLEMENTATION.md) for validator details.
 
-### SIGHASHER_CODE
+#### SIGHASHER_CODE
 
 The source code for `SIGHASHER_CODE` is located [here](https://github.com/ethereum/casper/blob/master/casper/validation_codes/verify_hash_ladder_sig.se).
 
@@ -121,7 +121,7 @@ The EVM bytecode that the contract should be set to is:
 0x
 ```
 
-### PURITY_CHECKER_CODE
+#### PURITY_CHECKER_CODE
 
 The source code for `PURITY_CHECKER_CODE` is located [here](https://github.com/ethereum/research/blob/master/impurity/check_for_impurity.se).
 
@@ -135,7 +135,7 @@ The EVM bytecode that the contract should be set to is:
 0x
 ```
 
-### CASPER_CODE
+#### CASPER_CODE
 
 The source code for `CASPER_CODE` is located at
 [here](https://github.com/ethereum/casper/blob/master/casper/contracts/simple_casper.v.py).
