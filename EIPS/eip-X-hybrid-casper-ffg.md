@@ -33,7 +33,7 @@ The FFG contract can be layered on top of any block proposal mechanism, providin
 * `HYBRID_CASPER_FORK_BLKNUM`: TBD
 * `CASPER_ADDR`: TBD
 * `CASPER_CODE`: see below
-* `CASPER_BALANCE`: 5e24 (5_000_000 ETH)
+* `CASPER_BALANCE`: 5e24 wei (5,000,000 ETH)
 * `SIGHASHER_ADDR`: TBD
 * `SIGHASHER_CODE`: see below
 * `PURITY_CHECKER_ADDR`: TBD
@@ -45,13 +45,12 @@ The FFG contract can be layered on top of any block proposal mechanism, providin
 ### Casper Contract Parameters
 
 * `EPOCH_LENGTH`: 50 blocks
-* `WITHDRAWAL_DELAY`: 15000 epochs
+* `WITHDRAWAL_DELAY`: 15,000 epochs
 * `DYNASTY_LOGOUT_DELAY`: 700 dynasties
-* `SIGHASH_ADDR`: TBD
-* `PURITY_CHECKER_ADDR`: TBD
 * `BASE_INTEREST_FACTOR`: TBD
 * `BASE_PENALTY_FACTOR`: TBD
-* `MIN_DEPOSIT_SIZE`: 1000e18 wei (1000 ETH)
+* `MIN_DEPOSIT_SIZE`: 1e21 wei (1,000 ETH)
+
 
 ## Specification
 
