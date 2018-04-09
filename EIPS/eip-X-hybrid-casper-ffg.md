@@ -20,6 +20,14 @@ Through the use of Ether deposits, slashing conditions, and a modified fork choi
 
 This EIP does not contain the safety and liveness proofs or the validator implementation details, but these can be found in the [Casper FFG paper](https://arxiv.org/abs/1710.09437) and [Validator Implementation Guide](https://github.com/ethereum/casper/blob/master/VALIDATOR_GUIDE.md) respectively.
 
+## Glossary
+
+* **epoch**: The span of blocks between checkpoints
+* **finality**: The point at which a block has been decided upon by a client to _never_ revert. Proof of Work does not have the concept of finality, only of further deep block confirmations.
+* **checkpoint**: The start block of an epoch. Rather than dealing with every block, Casper FFG only considers checkpoints for finalization.
+* **dynasty**: The number of finalized checkpoints in the chain from root to the parent of a block. The dynasty is used to define when a validator starts and ends validating.
+* **slash**: The burning of a validator's deposit. Slashing occurs when a validator signs two conflicting messages that violate a slashing condition. For an indepth discussion of slashing conditions, see the [Casper FFG Paper](https://arxiv.org/abs/1710.09437)
+
 ## Motivation
 
 Transitioning the Ethereum network from PoW to PoS has been on the roadmap and in the [Yellow Paper](https://github.com/ethereum/yellowpaper) since the launch of the protocol. Although effective in coming to a decentralized consensus, PoW consumes an incredible amount of energy, has no economic finality, and has no effective strategy in resisting cartles. Excessive energy consumption, issues with equal access to mining hardware, mining pool centralization, and an emerging market of ASICs each provide a distinct motivation to make the transition as soon as possible.
@@ -175,7 +183,7 @@ delay_in_months = (15000 epochs) * (50 blocks/epoch) * (14 seconds/block) * (1/8
 round(delay_in_months, 2) == 4.00
 ```
 
-`DYNASTY_LOGOUT_DELAY` is set set to 700 dynasties to prevent immediately logging out in the event of an attack from being a viable strategy.
+`DYNASTY_LOGOUT_DELAY` is set set to 700 dynasties to prevent immediate logout in the event of an attack from being a viable strategy.
 
 #### Issuance
 A fixed amount of 5 million ether was chosen as `CASPER_BALANCE` to fund the casper contract. This only gives the contract enough runway to operate for approximately _insert time based on economic constants_, acting similarly to the "difficulty bomb". This "funding crunch" forces the network to hard-fork in the relative near future to further fund the contract. This future hard fork is a good opportunity to upgrade the contract and likely transition to full PoS.
