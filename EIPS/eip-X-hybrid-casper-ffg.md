@@ -10,15 +10,15 @@ created: 2018-04-05
 
 ## Simple Summary
 
-There is a general consensus to transition Ethereum from Proof of Work (PoW) to Proof of Stake (PoS). This EIP provides a specification of the first step in this process -- a hybrid model that uses both PoW and PoS to build and secure the network.
+Specification of the first step to transition Ethereum main net from Proof of Work (PoW) to Proof of Stake (PoS). The resulting consensus model is a PoW/PoS hybrid.
 
 ## Abstract
 
-This EIP describes the specification for implementing and hard-forking the Ethereum network to support hybrid PoW/PoS via Casper the Friendly Finality Gadget (FFG). In this hybrid model, existing PoW mechanics are used as the block proposal mechanism while PoS is layered on top via an EVM contract, providing economic finality through a modified fork choice rule. Because network security is partially shifted from PoW to PoS, PoW block reward is reduced.
+This EIP specifies a hybrid PoW/PoS consensus model for Ethereum main net. Existing PoW mechanics are used for new block creation, and a novel PoS mechanism called Casper the Friendly Finality Gadget (FFG) is layered on top using a smart contract.
 
-This EIP does not provide safety or liveness proofs. See the [Casper FFG](https://arxiv.org/abs/1710.09437) paper for a more detailed formal discussion.
+Through the use of Ether deposits, slashing conditions, and a modified fork choice, FFG allows the underlying PoW blockchain to be finalized.  As network security is partially shifted from PoW to PoS, PoW block rewards can be reduced. 
 
-This EIP does not provide validator implementation details. See the [Casper Implementation Guide](https://github.com/ethereum/casper/blob/master/IMPLEMENTATION.md) for validator details.
+This EIP does not contain the safety and liveness proofs or the validator implementation details, but these can be found in the [Casper FFG paper](https://arxiv.org/abs/1710.09437) and [Validator Implementation Guide](https://github.com/ethereum/casper/blob/master/VALIDATOR_GUIDE.md) respectively.
 
 ## Motivation
 
@@ -33,7 +33,7 @@ The FFG contract can be layered on top of any block proposal mechanism, providin
 * `HYBRID_CASPER_FORK_BLKNUM`: TBD
 * `CASPER_ADDR`: TBD
 * `CASPER_CODE`: see below
-* `CASPER_BALANCE`: 5e24 (5_000_000 ETH)
+* `CASPER_BALANCE`: 5e24 wei (5,000,000 ETH)
 * `SIGHASHER_ADDR`: TBD
 * `SIGHASHER_CODE`: see below
 * `PURITY_CHECKER_ADDR`: TBD
@@ -45,13 +45,12 @@ The FFG contract can be layered on top of any block proposal mechanism, providin
 ### Casper Contract Parameters
 
 * `EPOCH_LENGTH`: 50 blocks
-* `WITHDRAWAL_DELAY`: 15000 epochs
+* `WITHDRAWAL_DELAY`: 15,000 epochs
 * `DYNASTY_LOGOUT_DELAY`: 700 dynasties
-* `SIGHASH_ADDR`: TBD
-* `PURITY_CHECKER_ADDR`: TBD
 * `BASE_INTEREST_FACTOR`: TBD
 * `BASE_PENALTY_FACTOR`: TBD
-* `MIN_DEPOSIT_SIZE`: 1000e18 wei (1000 ETH)
+* `MIN_DEPOSIT_SIZE`: 1e21 wei (1,000 ETH)
+
 
 ## Specification
 
@@ -115,7 +114,7 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, then `block_reward = NEW_BLOCK_R
 #### Validators
 
 The mechanics and responsibilities of validators are not specified in this EIP because they rely upon network transactions to the contract at `CASPER_ADDR` rather than on protocol level implementation and changes.
-See the [Casper Implementation Guide](https://github.com/ethereum/casper/blob/master/IMPLEMENTATION.md) for validator details.
+See the [Validator Implementation Guide](https://github.com/ethereum/casper/blob/master/VALIDATOR_GUIDE.md) for validator details.
 
 #### SIGHASHER_CODE
 
@@ -163,7 +162,9 @@ The EVM bytecode that the contract should be set to is:
 ## Rationale
 
 #### Minimize Consensus Changes
-Many of the above specification details were made to minimize consensus changes across clients. Firstly, the finality gadget itself is implemented as a contract in the EVM rather than as client specific logic in the protocol layer. The contract bytecode is deployed once and encapsulates most of the complexity of the fork. Similarly, `CASPER_ADDR` is granted a balance of ether from which to issue validator rewards. This could have been implemented in the protocol layer, granting special privilages to `CASPER_ADDR` to mint ether, but these options were all seen as far more invasive and error prone than relying upon the existing mechanics of the EVM. If a client has correct logic for a contract sending ether, then that client can handle casper issuance.
+The finality gadget is designed to minimize changes across clients. For this reason, FFG is implemented within the EVM, so that the contract byte code encapsulates most of the complexity of the fork.
+
+For example, it would be possible to allow `CASPER_ADDR` to mint Ether each time it payed rewards (as compared to creating the contract with `CASPER_BALANCE`), but this would be more invasive and error-prone than relying on existing EVM mechanics. 
 
 #### Economic Constants
 *insert: Discuss economic constants*
@@ -190,7 +191,7 @@ The call to `initialize_epoch` at the beginning of each epoch requires 0 gas so 
 This EIP implements a limited version of account abstraction for validator's `vote` transactions. The general design was borrowed from [EIP 86](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-86.md).
 
 ## Backwards Compatibility
-This EIP is not forward compatible and introduces backwards incompatibilities in the state, fork choice rule, block reward, and gas calculations on certain transactions. Therefore, it should be included in a scheduled hardfork at a certain block number.
+This EIP is not forward compatible and introduces backwards incompatibilities in the state, fork choice rule, block reward, transaction validity, and gas calculations on certain transactions. Therefore, all changes should be included in a scheduled hardfork at a `HYBRID_CASPER_FORK_BLKNUM`.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
