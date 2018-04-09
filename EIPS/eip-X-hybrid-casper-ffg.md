@@ -73,12 +73,14 @@ If `block.number == HYBRID_CASPER_FORK_BLKNUM`, then when processing the block, 
 
 #### Initialize Epochs
 
-If `block.number >= HYBRID_CASPER_FORK_BLKNUM and block.number % EPOCH_LENGTH == 0`, then execute a call with the following parameters at the start of the block:
+If `block.number >= HYBRID_CASPER_FORK_BLKNUM` and `block.number % EPOCH_LENGTH == 0`, then execute a call with the following parameters at the start of the block:
 
 * `SENDER`: NULL_SENDER
 * `GAS`: 3141592
 * `TO`: CASPER_ADDR
 * `VALUE`: 0
+* `NONCE`: 0
+* `GASPRICE`: 0
 * `DATA`: <encoded call {method: 'initialize_epoch', args: [floor(block.number / EPOCH_LENGTH)]}`>
 
 This transaction utilizes no gas and does not increment `NULL_SENDER`s nonce
@@ -87,10 +89,13 @@ This transaction utilizes no gas and does not increment `NULL_SENDER`s nonce
 
 If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, then:
 
-* all successful `vote` transactions to `CASPER_ADDR` with sender as `NULL_SENDER`:
+* all `vote` transactions to `CASPER_ADDR`:
+  * must have the following signature `(CHAIN_ID, 0, 0)` (ie. `r = s = 0, v = CHAIN_ID`)
+  * must have sender as `NULL_SENDER`
+  * must have `value = nonce = gasprice = 0`
   * must be included at the end of the block
   * utilize no gas
-  * do not incrememt `NULL_SENDER`s nonce
+  * do not increment `NULL_SENDER`s nonce
 * all unsuccessful `vote` transactions to `CASPER_ADDR` are considered invalid and are not to be included in the block
 
 #### Fork Choice
