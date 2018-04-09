@@ -14,7 +14,7 @@ Specification of the first step to transition Ethereum main net from Proof of Wo
 
 ## Abstract
 
-This EIP specifies a hybrid PoW/PoS consensus model for Ethereum main net. Existing PoW mechanics are used for new block creation, and a novel PoS mechanism called Casper the Friendly Finality Gadget (FFG) is is layered on top using a smart contract.
+This EIP specifies a hybrid PoW/PoS consensus model for Ethereum main net. Existing PoW mechanics are used for new block creation, and a novel PoS mechanism called Casper the Friendly Finality Gadget (FFG) is layered on top using a smart contract.
 
 Through the use of Ether deposits, slashing conditions, and a modified fork choice, FFG allows the underlying PoW blockchain to be finalized.  As network security is partially shifted from PoW to PoS, PoW block rewards can be reduced. 
 
@@ -162,7 +162,7 @@ The EVM bytecode that the contract should be set to is:
 ## Rationale
 
 #### Minimize Consensus Changes
-The finality gadget is designed to minimize minimize changes across clients. For this reason, FFG is implemented within the EVM, so that the contract byte code encapsulates most of the complexity of the fork.
+The finality gadget is designed to minimize changes across clients. For this reason, FFG is implemented within the EVM, so that the contract byte code encapsulates most of the complexity of the fork.
 
 For example, it would be possible to allow `CASPER_ADDR` to mint Ether each time it payed rewards (as compared to creating the contract with `CASPER_BALANCE`), but this would be more invasive and error-prone than relying on existing EVM mechanics. 
 
