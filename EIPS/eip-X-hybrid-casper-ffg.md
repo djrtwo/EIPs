@@ -22,9 +22,9 @@ This EIP does not contain the safety and liveness proofs or the validator implem
 
 ## Motivation
 
-Transitioning the Ethereum network from PoW to PoS has been on the roadmap and in the [Yellow Paper](https://github.com/ethereum/yellowpaper) since the launch of the protocol. Although effective in coming to a decentralized consensus, PoW consumes an incredible amount of energy. Bitcoin's energy consumption alone is currently estimated to be about as much as the entire country of Columbia, and Ethereum's is estimated at about that of Cuba's ([Bitcoin Energy Index](https://digiconomist.net/bitcoin-energy-consumption), [Ethereum Energy Index](https://digiconomist.net/ethereum-energy-consumption)). Excessive energy consumption, issues with equal access to mining hardware, and an emerging market of ASICs each provide a distinct motivation to make the transition as soon as possible.
+Transitioning the Ethereum network from PoW to PoS has been on the roadmap and in the [Yellow Paper](https://github.com/ethereum/yellowpaper) since the launch of the protocol. Although effective in coming to a decentralized consensus, PoW consumes an incredible amount of energy, has no economic finality, and has no effective strategy in resisting cartles. Excessive energy consumption, issues with equal access to mining hardware, mining pool centralization, and an emerging market of ASICs each provide a distinct motivation to make the transition as soon as possible.
 
-Until recently, the proper way to make this transition was still an open area of research. In October of 2017 [Casper the Friendly Finality Gadget](https://arxiv.org/abs/1710.09437) was published, solving open questions of providing economic finality and punishing bad attackers validating across multiple forks. Through the FFG contract, validators post a deposit in ether and finalize "checkpoints" providing consensus on points in the chain that will never be reverted. If a validator is caught signing messages that could result in the finalization of conflicting checkpoints, proof of these messages can be submit to the FFG contract, and the validator's deposit is "slashed" or burned. This slashing mechanism provides "accountable safety". For a detailed discussion and proofs of "accountable safety" and "plausible liveness", please see the [Casper FFG](https://arxiv.org/abs/1710.09437) paper.
+Until recently, the proper way to make this transition was still an open area of research. In October of 2017 [Casper the Friendly Finality Gadget](https://arxiv.org/abs/1710.09437) was published, solving open questions of providing economic finality and punishing bad attackers validating across multiple forks.  For a detailed discussion and proofs of "accountable safety" and "plausible liveness", please see the [Casper FFG](https://arxiv.org/abs/1710.09437) paper.
 
 The FFG contract can be layered on top of any block proposal mechanism, providing finality to the underlying chain. This EIP proposes layering FFG on top of the existing PoW block proposal mechanism as a conservative step-wise approach in the transition to full PoS. The new FFG staking mechanism requires minimal changes to the protocol, allowing us to fully test and vet FFG on PoW before moving to a validator based block proposal mechanism.
 
@@ -71,7 +71,7 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM and block.number % EPOCH_LENGTH ==
 * `GAS`: 3141592
 * `TO`: CASPER_ADDR
 * `VALUE`: 0
-* `DATA`: <encoded call `casper_translator.encode('initialize_epoch', [floor(block.number / EPOCH_LENGTH)])`>
+* `DATA`: <encoded call {method: 'initialize_epoch', args: [floor(block.number / EPOCH_LENGTH)]}`>
 
 This transaction utilizes no gas and does not increment `NULL_SENDER`s nonce
 
