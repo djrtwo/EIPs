@@ -18,7 +18,7 @@ This EIP specifies a hybrid PoW/PoS consensus model for Ethereum main net. Exist
 
 Through the use of Ether deposits, slashing conditions, and a modified fork choice, FFG allows the underlying PoW blockchain to be finalized.  As network security is partially shifted from PoW to PoS, PoW block rewards can be reduced. 
 
-This EIP does not contain the safety and liveness proofs or the validator implementation details, but these can be found in the [Casper FFG paper](https://arxiv.org/abs/1710.09437) and [Casper Implementation Guide](https://github.com/ethereum/casper/blob/master/IMPLEMENTATION.md) respectively.
+This EIP does not contain the safety and liveness proofs or the validator implementation details, but these can be found in the [Casper FFG paper](https://arxiv.org/abs/1710.09437) and [Validator Implementation Guide](https://github.com/ethereum/casper/blob/master/VALIDATOR_GUIDE.md) respectively.
 
 ## Motivation
 
@@ -114,7 +114,7 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, then `block_reward = NEW_BLOCK_R
 #### Validators
 
 The mechanics and responsibilities of validators are not specified in this EIP because they rely upon network transactions to the contract at `CASPER_ADDR` rather than on protocol level implementation and changes.
-See the [Casper Implementation Guide](https://github.com/ethereum/casper/blob/master/IMPLEMENTATION.md) for validator details.
+See the [Validator Implementation Guide](https://github.com/ethereum/casper/blob/master/VALIDATOR_GUIDE.md) for validator details.
 
 #### SIGHASHER_CODE
 
