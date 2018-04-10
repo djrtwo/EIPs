@@ -184,7 +184,26 @@ Other were also designed to minimize changes across clients. For example, it wou
 
 #### Economic Constants
 
-*insert: Discuss economic constants*
+Casper controls the payout with the reward factor, which is defined as:
+
+`reward_factor = base_interest_factor / sqrt_of_total_deposits  + base_penalty_factor * epochs_since_finalization`
+
+The rewards and penalties are applied individually and collectively:
+
+Individually, when a voter votes, their unscaled deposit instantly increase `validator.deposit *= 1 + reward_factor`
+
+Collectively, every validators' deposits get rescaled
+
+`deposit_scale_factor[epoch] = deposit_scale_factor[epoch - 1] * (1 + vote_fraction * reward_factor / 2) / (1 + reward_factor)`
+
+As a result, validators who have voted, their rescaled deposit are multiplied by `1 + vote_fraction * reward_factor / 2`, while those who haven't are by `(1 + vote_fraction * reward_factor / 2) / (1 + reward_factor)`.
+
+
+`BASE_INTEREST_FACTOR`: Casper distributing fix amount of reward to the staking pool. This factor determines how much decrease in reward if the pool become larger.
+
+`BASE_PENALTY_FACTOR`: Epochs since finalization measures how well the validators are finalizing checkpoints. This factor determines if checkpoints are not finalized often, how much deposits of non-voters should be scaled down and of voters should be rewarded to. Note that if no checkpoint is finalized too long, though voters get higher rewards by penalty factor, their rewards are also decreased due to the effect of decreasing total deposits.
+
+`MIN_DEPOSIT_SIZE`: This forms a natural upper bound of the total numbers of validators.
 
 `WITHDRAWAL_DELAY` is set to 15000 epochs to freeze a validator's funds for approximately 4 months after logout. This allows for at least a 4 month window to identify and slash a validator for attempting to finalize two conflicting checkpoints. This defines the window of time with which a client must log on to sync a network due to weak subjectivity.
 ```python
