@@ -22,19 +22,19 @@ This EIP does not contain the safety and liveness proofs or the validator implem
 
 ## Glossary
 
-* **epoch**: The span of blocks between checkpoints
+* **epoch**: The span of blocks between checkpoints.
 * **finality**: The point at which a block has been decided upon by a client to _never_ revert. Proof of Work does not have the concept of finality, only of further deep block confirmations.
 * **checkpoint**: The start block of an epoch. Rather than dealing with every block, Casper FFG only considers checkpoints for finalization.
 * **dynasty**: The number of finalized checkpoints in the chain from root to the parent of a block. The dynasty is used to define when a validator starts and ends validating.
-* **slash**: The burning of a validator's deposit. Slashing occurs when a validator signs two conflicting messages that violate a slashing condition. For an indepth discussion of slashing conditions, see the [Casper FFG Paper](https://arxiv.org/abs/1710.09437)
+* **slash**: The burning of a validator's deposit. Slashing occurs when a validator signs two conflicting messages that violate a slashing condition. For an indepth discussion of slashing conditions, see the [Casper FFG Paper](https://arxiv.org/abs/1710.09437).
 
 ## Motivation
 
-Transitioning the Ethereum network from PoW to PoS has been on the roadmap and in the [Yellow Paper](https://github.com/ethereum/yellowpaper) since the launch of the protocol. Although effective in coming to a decentralized consensus, PoW consumes an incredible amount of energy, has no economic finality, and has no effective strategy in resisting cartles. Excessive energy consumption, issues with equal access to mining hardware, mining pool centralization, and an emerging market of ASICs each provide a distinct motivation to make the transition as soon as possible.
+Transitioning the Ethereum network from PoW to PoS has been on the roadmap and in the [Yellow Paper](https://github.com/ethereum/yellowpaper) since the launch of the protocol. Although effective in coming to a decentralized consensus, PoW consumes an incredible amount of energy, has no economic finality, and has no effective strategy in resisting cartels. Excessive energy consumption, issues with equal access to mining hardware, mining pool centralization, and an emerging market of ASICs each provide a distinct motivation to make the transition as soon as possible.
 
-Until recently, the proper way to make this transition was still an open area of research. In October of 2017 [Casper the Friendly Finality Gadget](https://arxiv.org/abs/1710.09437) was published, solving open questions of providing economic finality and punishing bad attackers validating across multiple forks.  For a detailed discussion and proofs of "accountable safety" and "plausible liveness", please see the [Casper FFG](https://arxiv.org/abs/1710.09437) paper.
+Until recently, the proper way to make this transition was still an open area of research. In October of 2017 [Casper the Friendly Finality Gadget](https://arxiv.org/abs/1710.09437) was published, solving open questions of economic finality through validator deposits and crypto-economic incentives. For a detailed discussion and proofs of "accountable safety" and "plausible liveness", see the [Casper FFG](https://arxiv.org/abs/1710.09437) paper.
 
-The FFG contract can be layered on top of any block proposal mechanism, providing finality to the underlying chain. This EIP proposes layering FFG on top of the existing PoW block proposal mechanism as a conservative step-wise approach in the transition to full PoS. The new FFG staking mechanism requires minimal changes to the protocol, allowing us to fully test and vet FFG on PoW before moving to a validator based block proposal mechanism.
+The Casper FFG contract can be layered on top of any block proposal mechanism, providing finality to the underlying chain. This EIP proposes layering FFG on top of the existing PoW block proposal mechanism as a conservative step-wise approach in the transition to full PoS. The new FFG staking mechanism requires minimal changes to the protocol, allowing the Ethereum network to fully test and vet Casper FFG on top of PoW before moving to a validator based block proposal mechanism.
 
 ## Parameters
 
@@ -48,7 +48,7 @@ The FFG contract can be layered on top of any block proposal mechanism, providin
 * `PURITY_CHECKER_CODE`: see below
 * `NULL_SENDER`: `2**160 - 1`
 * `NEW_BLOCK_REWARD`: 6e17 wei (0.6 ETH)
-* `NON_REVERT_MIN_DEPOSIT`: amount in wei decided by client
+* `NON_REVERT_MIN_DEPOSIT`: amount in wei configurable by client
 
 ### Casper Contract Parameters
 
@@ -174,6 +174,8 @@ The EVM bytecode that the contract should be set to is:
 
 ## Rationale
 
+Naive PoS specs and implementations have existed since early blockchain days, but most are vulnerable to serious attacks and do not hold up under crypto-economic analysis. Casper FFG solves problems such as "Nothing at Stake" and "Long Range Attacks" through requiring validators to post slashable deposits and through defining economic finality.
+
 #### Minimize Consensus Changes
 The finality gadget is designed to minimize changes across clients. For this reason, FFG is implemented within the EVM, so that the contract byte code encapsulates most of the complexity of the fork.
 
@@ -182,7 +184,7 @@ Other were also designed to minimize changes across clients. For example, it wou
 #### Economic Constants
 *insert: Discuss economic constants*
 
-`WITHDRAWAL_DELAY` is set to 15000 epochs to freeze a validator's funds for approximately 4 months after logout. This allows for a 4 month window to find and slash a validator for attempting to finalize two conflicting checkpoints.
+`WITHDRAWAL_DELAY` is set to 15000 epochs to freeze a validator's funds for approximately 4 months after logout. This allows for at least a 4 month window to identify and slash a validator for attempting to finalize two conflicting checkpoints. This defines the window of time with which a client must log on to sync a network due to weak subjectivity.
 ```python
 delay_in_months = (15000 epochs) * (50 blocks/epoch) * (14 seconds/block) * (1/86400 days/second) * (1/30.4 month/day)
 round(delay_in_months, 2) == 4.00
