@@ -177,12 +177,33 @@ The EVM bytecode that the contract should be set to is:
 Naive PoS specs and implementations have existed since early blockchain days, but most are vulnerable to serious attacks and do not hold up under crypto-economic analysis. Casper FFG solves problems such as "Nothing at Stake" and "Long Range Attacks" through requiring validators to post slashable deposits and through defining economic finality.
 
 #### Minimize Consensus Changes
+
 The finality gadget is designed to minimize changes across clients. For this reason, FFG is implemented within the EVM, so that the contract byte code encapsulates most of the complexity of the fork.
 
 Other were also designed to minimize changes across clients. For example, it would be possible to allow `CASPER_ADDR` to mint Ether each time it payed rewards (as compared to creating the contract with `CASPER_BALANCE`), but this would be more invasive and error-prone than relying on existing EVM mechanics.
 
 #### Economic Constants
-*insert: Discuss economic constants*
+
+Casper controls the payout with the reward factor, which is defined as:
+
+`reward_factor = base_interest_factor / sqrt_of_total_deposits  + base_penalty_factor * epochs_since_finalization`
+
+The rewards and penalties are applied individually and collectively:
+
+Individually, when a voter votes, their unscaled deposit instantly increase `validator.deposit *= 1 + reward_factor`
+
+Collectively, every validators' deposits get rescaled
+
+`deposit_scale_factor[epoch] = deposit_scale_factor[epoch - 1] * (1 + vote_fraction * reward_factor / 2) / (1 + reward_factor)`
+
+As a result, validators who have voted, their rescaled deposit are multiplied by `1 + vote_fraction * reward_factor / 2`, while those who haven't are by `(1 + vote_fraction * reward_factor / 2) / (1 + reward_factor)`.
+
+
+`BASE_INTEREST_FACTOR`: Casper distributing fix amount of reward to the staking pool. This factor determines how much decrease in reward if the pool become larger.
+
+`BASE_PENALTY_FACTOR`: Epochs since finalization measures how well the validators are finalizing checkpoints. This factor determines if checkpoints are not finalized often, how much deposits of non-voters should be scaled down and of voters should be rewarded to. Note that if no checkpoint is finalized too long, though voters get higher rewards by penalty factor, their rewards are also decreased due to the effect of decreasing total deposits.
+
+`MIN_DEPOSIT_SIZE`: This forms a natural upper bound of the total numbers of validators.
 
 `WITHDRAWAL_DELAY` is set to 15000 epochs to freeze a validator's funds for approximately 4 months after logout. This allows for at least a 4 month window to identify and slash a validator for attempting to finalize two conflicting checkpoints. This defines the window of time with which a client must log on to sync a network due to weak subjectivity.
 ```python
@@ -193,19 +214,29 @@ round(delay_in_months, 2) == 4.00
 `DYNASTY_LOGOUT_DELAY` is set set to 700 dynasties to prevent immediate logout in the event of an attack from being a viable strategy.
 
 #### Issuance
+
 A fixed amount of 5 million ether was chosen as `CASPER_BALANCE` to fund the casper contract. This only gives the contract enough runway to operate for approximately _insert time based on economic constants_, acting similarly to the "difficulty bomb". This "funding crunch" forces the network to hard-fork in the relative near future to further fund the contract. This future hard fork is a good opportunity to upgrade the contract and likely transition to full PoS.
 
 The PoW block reward is further reduced to 0.6 eth/block because security of the chain is greatly shifted from PoW to PoS finality and because rewards are now issued to both stakers and miners.
 
 #### Gas Changes
+
 Successful casper `vote` transactions are included at the end of the block so that they can be processed in parallel with normal block transactions and cost 0 gas for validators.
 
 The call to `initialize_epoch` at the beginning of each epoch requires 0 gas so that this protocol state transition does not take any gas allowance away from normal transactions.
 
 #### NULL_SENDER and Account Abstraction
+
 This EIP implements a limited version of account abstraction for validator's `vote` transactions. The general design was borrowed from [EIP 86](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-86.md).
 
+This allows validators to customize their own signing scheme for votes. Use cases include:
+
+    * quantum-secure signature schemes
+    * multisig wallets
+    * threshold schemes
+
 ## Backwards Compatibility
+
 This EIP is not forward compatible and introduces backwards incompatibilities in the state, fork choice rule, block reward, transaction validity, and gas calculations on certain transactions. Therefore, all changes should be included in a scheduled hardfork at a `HYBRID_CASPER_FORK_BLKNUM`.
 
 ## Copyright
