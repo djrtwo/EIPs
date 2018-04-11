@@ -16,7 +16,7 @@ Specification of the first step to transition Ethereum main net from Proof of Wo
 
 This EIP specifies a hybrid PoW/PoS consensus model for Ethereum main net. Existing PoW mechanics are used for new block creation, and a novel PoS mechanism called Casper the Friendly Finality Gadget (FFG) is layered on top using a smart contract.
 
-Through the use of Ether deposits, slashing conditions, and a modified fork choice, FFG allows the underlying PoW blockchain to be finalized.  As network security is partially shifted from PoW to PoS, PoW block rewards can be reduced. 
+Through the use of Ether deposits, slashing conditions, and a modified fork choice, FFG allows the underlying PoW blockchain to be finalized.  As network security is partially shifted from PoW to PoS, PoW block rewards can be reduced.
 
 This EIP does not contain the safety and liveness proofs or the validator implementation details, but these can be found in the [Casper FFG paper](https://arxiv.org/abs/1710.09437) and [Validator Implementation Guide](https://github.com/ethereum/casper/blob/master/VALIDATOR_GUIDE.md) respectively.
 
@@ -91,11 +91,11 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, then:
 
 * all `vote` transactions to `CASPER_ADDR`:
   * must have the following signature `(CHAIN_ID, 0, 0)` (ie. `r = s = 0, v = CHAIN_ID`)
+  * must have `value == nonce == gasprice == 0`
   * must have sender as `NULL_SENDER`
-  * must have `value = nonce = gasprice = 0`
   * must be included at the end of the block
-  * utilize no gas
-  * do not increment `NULL_SENDER`s nonce
+  * do not count toward the block gas limit, and pay no fee
+  * do not increment `NULL_SENDER`'s nonce
 * all unsuccessful `vote` transactions to `CASPER_ADDR` are considered invalid and are not to be included in the block
 
 #### Fork Choice
