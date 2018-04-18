@@ -81,7 +81,7 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM` and `block.number % EPOCH_LENGTH 
 * `VALUE`: 0
 * `NONCE`: 0
 * `GASPRICE`: 0
-* `DATA`: <encoded call {method: 'initialize_epoch', args: [floor(block.number / EPOCH_LENGTH)]}`>
+* `DATA`: `<encoded call {method: 'initialize_epoch', args: [floor(block.number / EPOCH_LENGTH)]}`>`
 
 This `CALL` utilizes no gas and does not increment the nonce of `NULL_SENDER`
 
@@ -89,17 +89,17 @@ This `CALL` utilizes no gas and does not increment the nonce of `NULL_SENDER`
 
 If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, then:
 
-* a valid `vote` transaction to `CASPER_ADDR` must satisfy each of the following:
-  * must have the following signature `(CHAIN_ID, 0, 0)` (ie. `r = s = 0, v = CHAIN_ID`)
-  * must have `value == nonce == gasprice == 0`
-* when producing and validating a block, when handling `vote` transactions to `CASPER_ADDR`:
-  * only include "valid" `vote` transactions as defined above
-  * place all `vote` transactions at the end of the block
-* when applying `vote` transactions to `CASPER_ADDR` to vm state:
-  * set sender to `NULL_SENDER`
-  * do not count gas of `vote` toward the block gas limit
-  * do not increment the nonce of `NULL_SENDER`
-* all unsuccessful `vote` transactions to `CASPER_ADDR` are considered invalid and are not to be included in the block
+* A valid `vote` transaction to `CASPER_ADDR` must satisfy each of the following:
+  * Must have the following signature `(CHAIN_ID, 0, 0)` (ie. `r = s = 0, v = CHAIN_ID`)
+  * Must have `value == nonce == gasprice == 0`
+* When producing and validating a block, when handling `vote` transactions to `CASPER_ADDR`:
+  * Only include "valid" `vote` transactions as defined above
+  * Place all `vote` transactions at the end of the block
+* When applying `vote` transactions to `CASPER_ADDR` to vm state:
+  * Set sender to `NULL_SENDER`
+  * Must not count gas of `vote` toward the block gas limit
+  * Must not increment the nonce of `NULL_SENDER`
+* All unsuccessful `vote` transactions to `CASPER_ADDR` are invalid and must not be included in the block
 
 #### Fork Choice
 
@@ -110,7 +110,7 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, the fork choice rule is the foll
 
 _Note_: If the client has no finalized checkpoints, start PoW from the client's highest justified checkpoint. If the client has no justified or finalized checkpoints, simply choose the block with the highest PoW score as in normal PoW.
 
-A client considers a checkpoint finalized if each of the following are true:
+A client considers a checkpoint finalized if each of the following is true:
 * During an epoch, the previous epoch's checkpoint is finalized within the casper contract
 * The current dynasty deposits _during the epoch in question*_ were greater than `NON_REVERT_MIN_DEPOSIT`
 * The previous dynasty deposits _during the epoch in question*_ were greater than `NON_REVERT_MIN_DEPOSIT`
@@ -120,7 +120,7 @@ casper_state_during_epoch_in_question.total_curdyn_deposits_scaled() > NON_REVER
 casper_state_during_epoch_in_question.total_prevdyn_deposits_scaled() > NON_REVERT_MIN_DEPOSIT
 ```
 
-A client considers a checkpoint justified if each of the following are true:
+A client considers a checkpoint justified if each of the following is true:
 * During an epoch, the current epoch's checkpoint is justified within the casper contract
 * The current dynasty deposits _during the epoch in question*_ were greater than `NON_REVERT_MIN_DEPOSIT`
 * The previous dynasty deposits _during the epoch in question*_ were greater than `NON_REVERT_MIN_DEPOSIT`
@@ -188,29 +188,33 @@ TBD
 ```
 
 #### Client Settings
-Clients should implement the following configurable settings:
+
+Clients should be implemented with the following configurable settings:
 
 ##### NON_REVERT_MIN_DEPOSIT
+
 The minimum size of total deposits that the client must see in the FFG contract for the state of the contract to affect the client's fork choice. A suggested implementation is `--non-revert-min-deposit WEI_VALUE`.
 
 See "Fork Choice" more details.
 
 ##### Exclusion
-The ability to exclude a specified blockhash and all of it's decendents from a client's fork choice. A suggested implementation is `--exclude BLOCKHASHES` where `BLOCK_HASHES` is a comma delineated list of blockhashes to exclude.
+The ability to exclude a specified blockhash and all of it's descendants from a client's fork choice. A suggested implementation is `--exclude BLOCKHASHES`, where `BLOCK_HASHES` is a comma delimited list of blockhashes to exclude.
 
 ##### Join Fork
 The ability to manually join a fork specified by a blockhash. A suggested implementation is `--join-fork BLOCKHASH` where the client automatically sets the head to the block defined by`BLOCKHASH` and locally finalizes it.
 
 ## Rationale
 
-Naive PoS specs and implementations have existed since early blockchain days, but most are vulnerable to serious attacks and do not hold up under crypto-economic analysis. Casper FFG solves problems such as "Nothing at Stake" and "Long Range Attacks" through requiring validators to post slashable deposits and through defining economic finality.
+Naive PoS specifications and implementations have existed since early blockchain days, but most are vulnerable to serious attacks and do not hold up under crypto-economic analysis. Casper FFG solves problems such as "Nothing at Stake" and "Long Range Attacks" through requiring validators to post slashable deposits and through defining economic finality.
 
 #### Minimize Consensus Changes
+
 The finality gadget is designed to minimize changes across clients. For this reason, FFG is implemented within the EVM, so that the contract byte code encapsulates most of the complexity of the fork.
 
 Most other decisions were made to minimize changes across clients. For example, it would be possible to allow `CASPER_ADDR` to mint Ether each time it payed rewards (as compared to creating the contract with `CASPER_BALANCE`), but this would be more invasive and error-prone than relying on existing EVM mechanics.
 
 #### Casper Contract Params
+
 `EPOCH_LENGTH` is set to 50 blocks as a balance between time to finality and message overhead.
 
 `WITHDRAWAL_DELAY` is set to 15000 epochs to freeze a validator's funds for approximately 4 months after logout. This allows for at least a 4 month window to identify and slash a validator for attempting to finalize two conflicting checkpoints. This also defines the window of time with which a client must log on to sync the network due to weak subjectivity.
@@ -224,9 +228,10 @@ Most other decisions were made to minimize changes across clients. For example, 
 `MIN_DEPOSIT_SIZE` is set to 1000 ETH to form a natural upper bound on the total number of validators, bounding the overhead due to `vote` messages. Using formulas found [here](https://medium.com/@VitalikButerin/parametrizing-casper-the-decentralization-finality-time-overhead-tradeoff-3f2011672735) under "From validator count to minimum staking ETH", we estimate that with 1000 ETH minimum deposit at an assumed ~10M in total deposits there will be approximately 1300 validators at any given time. `vote`s are only sent after the first quarter of an epoch so 1300 votes have to fit into 37 blocks or ~35 `vote`s per block.
 
 #### Issuance
+
 A fixed amount of 1M ETH was chosen as `CASPER_BALANCE` to fund the casper contract. This gives the contract enough runway to operate for approximately 2 years (assuming ~10M ETH in validator deposits). Acting similarly to the "difficulty bomb", this "funding crunch" forces the network to hardfork in the relative near future to further fund the contract. This future hardfork is an opportunity to upgrade the contract and transition to full PoS.
 
-The PoW block reward is reduced to 0.6 ETH/block because the security of the chain is greatly shifted from PoW difficulty to PoS finality and because rewards are now issued to both stakers and miners.
+The PoW block reward is reduced to 0.6 ETH/block because the security of the chain is greatly shifted from PoW difficulty to PoS finality and because rewards are now issued to both validators and miners.
 
 Below is a table of deposit sizes with associated annual interest rate and approximate time until funding crunch:
 
@@ -238,14 +243,17 @@ Below is a table of deposit sizes with associated annual interest rate and appro
 | 40M ETH  | 2.48%    | ~1 year    |
 
 #### Gas Changes
+
 Successful casper `vote` transactions are included at the end of the block so that they can be processed in parallel with normal block transactions and cost 0 gas for validators.
 
 The call to `initialize_epoch` at the beginning of each epoch requires 0 gas so that this protocol state transition does not take any gas allowance away from normal transactions.
 
 #### NULL_SENDER and Account Abstraction
-This EIP implements a limited version of account abstraction for validator's `vote` transactions. The general design was borrowed from [EIP 86](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-86.md). Rather than relying upon native transaction signatures, validators specify a signature contract when sending their `deposit` to `CASPER_ADDR`. When casting a `vote`, the validator bundles and signs the parameters of their `vote` according to the requirements of their signature contract. The `vote` method of the casper contract checks the signature of the parameters against the validator's signature contract, exiting the transaction as unsuccessful if the signature is not successfully verified. 
+
+This EIP implements a limited version of account abstraction for validators' `vote` transactions. The general design was borrowed from [EIP 86](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-86.md). Rather than relying upon native transaction signatures, a validator specifies a signature contract when sending their `deposit` to `CASPER_ADDR`. When casting a `vote`, the validator bundles and signs the parameters of their `vote` according to the requirements of their signature contract. The `vote` method of the casper contract checks the signature of the parameters against the validator's signature contract, exiting the transaction as unsuccessful if the signature is not successfully verified. 
 
 This allows validators to customize their own signing scheme for votes. Use cases include:
+
 * quantum-secure signature schemes
 * multisig wallets
 * threshold schemes
@@ -254,22 +262,27 @@ For more details on validator account abstraction, see the [Validator Implementa
 
 #### Client Settings
 ##### NON_REVERT_MIN_DEPOSIT
-`NON_REVERT_MIN_DEPOSIT` is defined and configurable locally by each client. Clients are in charge of deciding upon the minimum deposits (security) at which they will accept the chain as finalized. In the general case, differing values in the choice of this local constant will not create any fork inconsistencies because clients with very strict finalization requirements will revert to following the longest PoW chain.
+
+`NON_REVERT_MIN_DEPOSIT` is defined and configurable locally by each client. Clients are in charge of deciding upon the minimum deposits (security) at which they will accept the chain as finalized. In the general case, differing values in the choice of this local constant will not create any fork inconsistencies because clients with very strict finalization requirements will revert to follow the longest PoW chain.
 
 Arguments have been made to hardcode a value into clients or the contract, but we cannot reasonably define security required for all clients especially in the context of massive fluctuations in the value of ETH.
 
 It is worth noting that due to `NON_REVERT_MIN_DEPOSIT` being defined locally it becomes very easy to turn off casper verification in the case of a bug by setting the value to 999999999999.
 
 ##### Exclusion
+
 This setting is useful in coordinating minority forks in cases of majority collusion.
 
 ##### Join Fork
+
 This setting is to be used by new clients that are syncing the network. Due to weak subjectivity, a blockhash must be supplied to successfully sync the network when initially starting a node.
 
 This setting is also useful for coordinating minority forks in cases of majority collusion.
 
-## Backwards Compatibility
-This EIP is not forward compatible and introduces backwards incompatibilities in the state, fork choice rule, block reward, transaction validity, and gas calculations on certain transactions. Therefore, all changes should be included in a scheduled hardfork at `HYBRID_CASPER_FORK_BLKNUM`.
+## Backward Compatibility
+
+This EIP is not forward compatible and introduces backward incompatibilities in the state, fork choice rule, block reward, transaction validity, and gas calculations on certain transactions. Therefore, all changes should be included in a scheduled hardfork at `HYBRID_CASPER_FORK_BLKNUM`.
 
 ## Copyright
+
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
